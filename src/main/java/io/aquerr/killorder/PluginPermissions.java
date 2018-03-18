@@ -1,8 +1,12 @@
 package io.aquerr.killorder;
 
+import javax.inject.Singleton;
+
 /**
  * Created by Aquerr on 2018-02-15.
  */
+
+@Singleton
 public abstract class PluginPermissions
 {
     public static final String HELP_COMMAND = "killorder.help";

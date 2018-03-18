@@ -3,9 +3,13 @@ package io.aquerr.killorder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import javax.inject.Singleton;
+
 /**
  * Created by Aquerr on 2018-02-09.
  */
+
+@Singleton
 public abstract class PluginInfo
 {
     public static final String Id = "killorder";
