@@ -4,14 +4,14 @@ import java.util.UUID;
 
 public final class Order
 {
-    private UUID ordererByPlayerUUID;
+    private UUID orderedByPlayerUUID;
     private UUID orderedPlayerUUID;
 
     private OrderReward orderReward;
 
     public Order(UUID ordererByPlayerUUID, UUID orderedPlayerUUID, OrderReward orderReward)
     {
-        this.ordererByPlayerUUID = ordererByPlayerUUID;
+        this.orderedByPlayerUUID = ordererByPlayerUUID;
         this.orderedPlayerUUID = orderedPlayerUUID;
         this.orderReward = orderReward;
     }
@@ -23,7 +23,7 @@ public final class Order
 
     public UUID getOrdererByPlayerUUID()
     {
-        return ordererByPlayerUUID;
+        return orderedByPlayerUUID;
     }
 
     public OrderReward getOrderReward()

@@ -1,6 +1,9 @@
 package io.aquerr.killorder.commands;
 
 import io.aquerr.killorder.KillOrder;
+import io.aquerr.killorder.entities.MoneyReward;
+import io.aquerr.killorder.entities.Order;
+import io.aquerr.killorder.managers.OrderManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -35,6 +38,8 @@ public class SelectCommand implements CommandExecutor
             gridInventory.set(6, 1, ItemStack.builder().itemType(ItemTypes.GLASS_PANE).quantity(1).build());
 
             player.openInventory(orderGUI);
+
+            OrderManager.addOrder(new Order(player.getUniqueId(), player.getUniqueId(), new MoneyReward(40)));
         }
 
         return CommandResult.success();
