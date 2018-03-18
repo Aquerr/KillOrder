@@ -30,4 +30,7 @@ public final class Order
     {
         return orderReward;
     }
+
+
+    // OrderBuilder
 }
