@@ -54,20 +54,20 @@ public class HOCONOrderStorage implements IStorage
             int availableIndex = getLastAvailableIndex(objectSet);
 
             _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "ordered-by-player"}).setValue(order.getOrdererByPlayerUUID().toString());
-            _confignNode.getNode(new Object[]{"orders", availableIndex, "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
-            _confignNode.getNode(new Object[]{"orders", availableIndex, "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
 
             if (order.getOrderReward().getOrderRewardType() == OrderRewardType.ITEM)
             {
-                _confignNode.getNode(new Object[]{"orders", availableIndex, "reward", "item"}).setValue(((ItemReward)order.getOrderReward()).getItem());
+                _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "item"}).setValue(((ItemReward)order.getOrderReward()).getItem());
             }
             else if(order.getOrderReward().getOrderRewardType() == OrderRewardType.MONEY)
             {
-                _confignNode.getNode(new Object[]{"orders", availableIndex, "reward", "item"}).setValue(((MoneyReward)order.getOrderReward()).getMoney());
+                _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "money"}).setValue(((MoneyReward)order.getOrderReward()).getMoney());
             }
             else if(order.getOrderReward().getOrderRewardType() == OrderRewardType.POWER)
             {
-                _confignNode.getNode(new Object[]{"orders", availableIndex, "reward", "item"}).setValue(((PowerReward)order.getOrderReward()).getPowerAmount());
+                _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "power"}).setValue(((PowerReward)order.getOrderReward()).getPowerAmount());
             }
 
             return saveChanges();
