@@ -12,13 +12,13 @@ public final class Order
 
     private OrderReward orderReward;
 
-//    public Order(int orderId, UUID orderedByPlayerUUID, UUID orderedPlayerUUID, OrderReward orderReward)
-//    {
-//        this.orderId = orderId;
-//        this.orderedByPlayerUUID = orderedByPlayerUUID;
-//        this.orderedPlayerUUID = orderedPlayerUUID;
-//        this.orderReward = orderReward;
-//    }
+    public Order(int orderId, UUID orderedByPlayerUUID, UUID orderedPlayerUUID, OrderReward orderReward)
+    {
+        this.orderId = orderId;
+        this.orderedByPlayerUUID = orderedByPlayerUUID;
+        this.orderedPlayerUUID = orderedPlayerUUID;
+        this.orderReward = orderReward;
+    }
 
     public Order(UUID ordererByPlayerUUID, UUID orderedPlayerUUID, OrderReward orderReward)
     {
@@ -43,6 +43,10 @@ public final class Order
         return orderReward;
     }
 
+    public int getOrderId()
+    {
+        return orderId;
+    }
 
     // OrderBuilder
 }

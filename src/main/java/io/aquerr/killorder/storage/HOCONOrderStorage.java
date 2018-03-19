@@ -1,18 +1,20 @@
 package io.aquerr.killorder.storage;
 
 import com.google.common.reflect.TypeToken;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import io.aquerr.killorder.entities.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 public class HOCONOrderStorage implements IStorage
 {
@@ -49,23 +51,21 @@ public class HOCONOrderStorage implements IStorage
     {
         try
         {
-            int availableIndex = getLastAvailableOrderIndex();
-
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "ordered-by-player"}).setValue(order.getOrdererByPlayerUUID().toString());
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrdererByPlayerUUID().toString());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
 
             if (order.getOrderReward().getOrderRewardType() == OrderRewardType.ITEM)
             {
-                _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "item"}).setValue(((ItemReward)order.getOrderReward()).getItem());
+                _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "item"}).setValue(((ItemReward)order.getOrderReward()).getItem());
             }
             else if(order.getOrderReward().getOrderRewardType() == OrderRewardType.MONEY)
             {
-                _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "money"}).setValue(((MoneyReward)order.getOrderReward()).getMoney());
+                _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "money"}).setValue(((MoneyReward)order.getOrderReward()).getMoney());
             }
             else if(order.getOrderReward().getOrderRewardType() == OrderRewardType.POWER)
             {
-                _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "reward", "power"}).setValue(((PowerReward)order.getOrderReward()).getPowerAmount());
+                _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "power"}).setValue(((PowerReward)order.getOrderReward()).getPowerAmount());
             }
 
             return saveChanges();
@@ -86,9 +86,48 @@ public class HOCONOrderStorage implements IStorage
     @Override
     public List<Order> getOrders()
     {
-        //_confignNode.getNode(new Object[]{"orders"}).getList()
+        Set<Object> objectSet = _confignNode.getNode("orders").getChildrenMap().keySet();
 
-        return null;
+        List<Order> orderList = new ArrayList<>();
+
+        for (Object objectId : objectSet)
+        {
+            int orderId = Integer.parseInt(objectId.toString());
+            UUID orderedByPlayer = UUID.fromString(_confignNode.getNode("orders", objectId, "ordered-by-player").getString());
+            UUID orderedPlayer = UUID.fromString(_confignNode.getNode("orders", objectId, "ordered-player").getString());
+
+            OrderRewardType rewardType = OrderRewardType.valueOf(_confignNode.getNode("orders", objectId, "reward", "type").getString());
+
+            Order order;
+
+            switch (rewardType)
+            {
+                case POWER:
+                    int power = _confignNode.getNode("orders", objectId, "reward", "power").getInt();
+                    order = new Order(orderId, orderedByPlayer, orderedPlayer, new PowerReward(power));
+                    orderList.add(order);
+                    break;
+                case MONEY:
+                    int money = _confignNode.getNode("orders", objectId, "reward", "money").getInt();
+                    order = new Order(orderId, orderedByPlayer, orderedPlayer, new MoneyReward(money));
+                    orderList.add(order);
+                    break;
+                case ITEM:
+                    try
+                    {
+                        ItemStack itemStack = _confignNode.getNode("orders", objectId, "reward", "item").getValue(TypeToken.of(ItemStack.class));
+                        order = new Order(orderId, orderedByPlayer, orderedPlayer, new ItemReward(itemStack));
+                        orderList.add(order);
+                        break;
+                    }
+                    catch (ObjectMappingException e)
+                    {
+                        e.printStackTrace();
+                    }
+            }
+        }
+
+        return orderList;
     }
 
     @Override

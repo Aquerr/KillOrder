@@ -39,7 +39,12 @@ public class SelectCommand implements CommandExecutor
 
             player.openInventory(orderGUI);
 
-            OrderManager.addOrder(new Order(player.getUniqueId(), player.getUniqueId(), new MoneyReward(40)));
+            Order order = new Order(player.getUniqueId(), player.getUniqueId(), new MoneyReward(40));
+
+            if (!OrderManager.getOrderList().contains(order))
+            {
+                OrderManager.addOrder(order);
+            }
         }
 
         return CommandResult.success();
