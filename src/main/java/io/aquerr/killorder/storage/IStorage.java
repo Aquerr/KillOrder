@@ -11,4 +11,6 @@ public interface IStorage
     boolean removeOrder(Order order);
 
     List<Order> getOrders();
+
+    int getLastAvailableOrderIndex();
 }

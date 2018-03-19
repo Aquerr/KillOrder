@@ -49,9 +49,7 @@ public class HOCONOrderStorage implements IStorage
     {
         try
         {
-            Set<Object> objectSet = _confignNode.getNode("orders").getChildrenMap().keySet();
-
-            int availableIndex = getLastAvailableIndex(objectSet);
+            int availableIndex = getLastAvailableOrderIndex();
 
             _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "ordered-by-player"}).setValue(order.getOrdererByPlayerUUID().toString());
             _confignNode.getNode(new Object[]{"orders", String.valueOf(availableIndex), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
@@ -88,11 +86,16 @@ public class HOCONOrderStorage implements IStorage
     @Override
     public List<Order> getOrders()
     {
+        //_confignNode.getNode(new Object[]{"orders"}).getList()
+
         return null;
     }
 
-    private int getLastAvailableIndex(Set<Object> objectSet)
+    @Override
+    public int getLastAvailableOrderIndex()
     {
+        Set<Object> objectSet = _confignNode.getNode("orders").getChildrenMap().keySet();
+
         int index = 1;
 
         for(;;)

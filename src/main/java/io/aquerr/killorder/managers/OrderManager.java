@@ -33,4 +33,9 @@ public class OrderManager
     {
         return _orderStorage.getOrders();
     }
+
+    public static int getLastAvailableIndex()
+    {
+        return _orderStorage.getLastAvailableOrderIndex();
+    }
 }
