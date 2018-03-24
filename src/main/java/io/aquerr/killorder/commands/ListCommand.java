@@ -1,7 +1,10 @@
 package io.aquerr.killorder.commands;
 
 import io.aquerr.killorder.PluginInfo;
+import io.aquerr.killorder.entities.ItemReward;
+import io.aquerr.killorder.entities.MoneyReward;
 import io.aquerr.killorder.entities.Order;
+import io.aquerr.killorder.entities.PowerReward;
 import io.aquerr.killorder.managers.OrderManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -10,7 +13,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -32,15 +34,15 @@ public class ListCommand implements CommandExecutor
         for(Order order : OrderManager.getOrderList())
         {
             String orderedPlayerName = null;
-            if (GameProfile.of(order.getOrderedPlayerUUID()).getName().isPresent())
+            if (Sponge.getServer().getPlayer(order.getOrderedPlayerUUID()).isPresent())
             {
-                orderedPlayerName = GameProfile.of(order.getOrderedPlayerUUID()).getName().get();
+                orderedPlayerName = Sponge.getServer().getPlayer(order.getOrderedPlayerUUID()).get().getName();
             }
 
             String orderingPlayerName = null;
-            if (GameProfile.of(order.getOrderedByPlayerUUID()).getName().isPresent())
+            if (Sponge.getServer().getPlayer(order.getOrderedByPlayerUUID()).isPresent())
             {
-                orderingPlayerName = GameProfile.of(order.getOrderedByPlayerUUID()).getName().get();
+                orderingPlayerName = Sponge.getServer().getPlayer(order.getOrderedByPlayerUUID()).get().getName();
             }
 
             if (order.isAccepted())
@@ -52,7 +54,7 @@ public class ListCommand implements CommandExecutor
 
                 Text.Builder orderText = Text.builder();
 
-                orderText.append(Text.of(TextColors.RED, order.getOrderId()  + "." + " " + "Kill " + orderedPlayerName));
+                orderText.append(Text.of(TextColors.RED, order.getOrderId()  + "." + " " + "Kill " + orderedPlayerName + " - Ordered by " + orderingPlayerName));
                 orderText.onHover(TextActions.showText(orderDesc.build()));
 
                 helpList.add(orderText.build());
@@ -62,11 +64,24 @@ public class ListCommand implements CommandExecutor
                 Text.Builder orderDesc = Text.builder();
 
                 orderDesc.append(Text.of(TextColors.GREEN, "Ordered by: " + orderingPlayerName + "\n"));
-                orderDesc.append(Text.of("Reward: " + order.getOrderReward().getOrderRewardType().name()));
+                orderDesc.append(Text.of("Reward: " + order.getOrderReward().getOrderRewardType().name() + "\n"));
+
+                if (order.getOrderReward() instanceof MoneyReward)
+                {
+                    orderDesc.append(Text.of("Money: " + ((MoneyReward)order.getOrderReward()).getMoney()));
+                }
+                else if (order.getOrderReward() instanceof PowerReward)
+                {
+                    orderDesc.append(Text.of("Power: " + ((PowerReward)order.getOrderReward()).getPowerAmount()));
+                }
+                else if (order.getOrderReward() instanceof ItemReward)
+                {
+                    orderDesc.append(Text.of("Item: " + ((ItemReward)order.getOrderReward()).getItem()));
+                }
 
                 Text.Builder orderText = Text.builder();
 
-                orderText.append(Text.of(TextColors.GREEN, order.getOrderId()  + "." + " " + "Kill " + orderedPlayerName));
+                orderText.append(Text.of(TextColors.YELLOW, order.getOrderId()  + "." + " " + "Kill " + orderedPlayerName + " - ordered by " + orderingPlayerName));
                 orderText.onHover(TextActions.showText(orderDesc.build()));
 
                 if (source instanceof Player)
@@ -80,7 +95,7 @@ public class ListCommand implements CommandExecutor
         }
 
         PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
-        PaginationList.Builder paginationBuilder = paginationService.builder().title(Text.of(TextColors.GOLD, "Orders list" + PluginInfo.Version)).padding(Text.of(TextColors.DARK_GREEN, "-")).contents(helpList).linesPerPage(10);
+        PaginationList.Builder paginationBuilder = paginationService.builder().title(Text.of(TextColors.GOLD, "Orders List")).padding(Text.of(TextColors.DARK_GREEN, "-")).contents(helpList).linesPerPage(10);
         paginationBuilder.sendTo(source);
 
         return CommandResult.success();
@@ -97,7 +112,7 @@ public class ListCommand implements CommandExecutor
             }
             else
             {
-                player.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.GREEN, "You accepted the order " + orderId + "!"));
+                player.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.GREEN, "You accepted order " + orderId + "!"));
                 OrderManager.acceptOrder(orderId, player.getUniqueId());
             }
         };

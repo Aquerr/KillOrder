@@ -35,21 +35,30 @@ public class SelectCommand implements CommandExecutor
         if (!optionalPlayer.isPresent())
         {
             source.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "You need to provide a player name!"));
-        }
-
-        if (!optionalRewardType.isPresent())
-        {
-            source.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "You need to provide a reward type!"));
-        }
-
-        if (!optionalReward.isPresent())
-        {
-            source.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "You need to provide a reward!"));
+            return CommandResult.empty();
         }
 
         if (source instanceof Player)
         {
             Player player = ((Player) source);
+
+            if (player.getName().equals(optionalPlayer.get().getName()))
+            {
+                player.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "You can't select yourself!"));
+                return CommandResult.success();
+            }
+
+            if (!optionalRewardType.isPresent())
+            {
+                source.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "You need to provide a reward type!"));
+                return CommandResult.empty();
+            }
+
+            if (!optionalReward.isPresent())
+            {
+                source.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "You need to provide a reward!"));
+                return CommandResult.empty();
+            }
 
 //            Inventory orderGUI = Inventory.builder().of(InventoryArchetypes.CHEST).property(InventoryTitle.PROPERTY_NAME,
 //                    InventoryTitle.of(Text.of("Orders"))).build(KillOrder.getInstance());
