@@ -2,6 +2,7 @@ package io.aquerr.killorder;
 
 import com.google.inject.Inject;
 import io.aquerr.killorder.commands.HelpCommand;
+import io.aquerr.killorder.commands.ListCommand;
 import io.aquerr.killorder.commands.SelectCommand;
 import io.aquerr.killorder.entities.MoneyReward;
 import io.aquerr.killorder.entities.Order;
@@ -63,12 +64,19 @@ public class KillOrder
 
         _subcommands = new HashMap<>();
 
+        //Select Command
         _subcommands.put(Arrays.asList("select"), CommandSpec.builder()
                 .description(Text.of("Selects a player for an order"))
                 .arguments(GenericArguments.optional(GenericArguments.player(Text.of("player"))),
                         GenericArguments.optional(GenericArguments.enumValue(Text.of("rewardtype"), OrderRewardType.class)),
                         GenericArguments.optional(GenericArguments.integer(Text.of("reward"))))
                 .executor(new SelectCommand())
+                .build());
+
+        //List Command
+        _subcommands.put(Arrays.asList("list"), CommandSpec.builder()
+                .description(Text.of("Shows list of orders"))
+                .executor(new ListCommand())
                 .build());
 
         //Build all commands
