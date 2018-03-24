@@ -6,6 +6,7 @@ import io.aquerr.killorder.commands.SelectCommand;
 import io.aquerr.killorder.entities.MoneyReward;
 import io.aquerr.killorder.entities.Order;
 import io.aquerr.killorder.entities.OrderReward;
+import io.aquerr.killorder.entities.OrderRewardType;
 import io.aquerr.killorder.listeners.InventoryClickListener;
 import io.aquerr.killorder.managers.OrderManager;
 import org.slf4j.Logger;
@@ -64,7 +65,9 @@ public class KillOrder
 
         _subcommands.put(Arrays.asList("select"), CommandSpec.builder()
                 .description(Text.of("Selects a player for an order"))
-                .arguments(GenericArguments.optional(GenericArguments.player(Text.of("player"))))
+                .arguments(GenericArguments.optional(GenericArguments.player(Text.of("player"))),
+                        GenericArguments.optional(GenericArguments.enumValue(Text.of("rewardtype"), OrderRewardType.class)),
+                        GenericArguments.optional(GenericArguments.integer(Text.of("reward"))))
                 .executor(new SelectCommand())
                 .build());
 

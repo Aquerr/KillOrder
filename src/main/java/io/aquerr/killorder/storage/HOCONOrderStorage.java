@@ -1,9 +1,7 @@
 package io.aquerr.killorder.storage;
 
 import com.google.common.reflect.TypeToken;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import io.aquerr.killorder.entities.*;
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -13,8 +11,10 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class HOCONOrderStorage implements IStorage
 {
@@ -51,8 +51,12 @@ public class HOCONOrderStorage implements IStorage
     {
         try
         {
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrdererByPlayerUUID().toString());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrdererdByPlayerUUID().toString());
             _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
+
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "is-accepted"}).setValue(order.isAccepted());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "accepted-by-player"}).setValue(order.getAcceptedByPlayerUUID());
+
             _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
 
             if (order.getOrderReward().getOrderRewardType() == OrderRewardType.ITEM)
@@ -78,9 +82,11 @@ public class HOCONOrderStorage implements IStorage
     }
 
     @Override
-    public boolean removeOrder(Order order)
+    public boolean removeOrder(int orderId)
     {
-        return false;
+        _confignNode.getNode("orders").removeChild(orderId);
+
+        return saveChanges();
     }
 
     @Override
@@ -96,6 +102,14 @@ public class HOCONOrderStorage implements IStorage
             UUID orderedByPlayer = UUID.fromString(_confignNode.getNode("orders", objectId, "ordered-by-player").getString());
             UUID orderedPlayer = UUID.fromString(_confignNode.getNode("orders", objectId, "ordered-player").getString());
 
+            boolean isAccepted = _confignNode.getNode(new Object[]{"orders", objectId, "is-accepted"}).getBoolean();
+            UUID acceptedByPlayerUUID = null;
+
+            if (_confignNode.getNode("orders", objectId, "accepted-by-player").getString() != null)
+            {
+                acceptedByPlayerUUID = UUID.fromString(_confignNode.getNode("orders", objectId, "accepted-by-player").getString());
+            }
+
             OrderRewardType rewardType = OrderRewardType.valueOf(_confignNode.getNode("orders", objectId, "reward", "type").getString());
 
             Order order;
@@ -104,19 +118,19 @@ public class HOCONOrderStorage implements IStorage
             {
                 case POWER:
                     int power = _confignNode.getNode("orders", objectId, "reward", "power").getInt();
-                    order = new Order(orderId, orderedByPlayer, orderedPlayer, new PowerReward(power));
+                    order = new Order(orderId, orderedByPlayer, orderedPlayer, new PowerReward(power), isAccepted, acceptedByPlayerUUID);
                     orderList.add(order);
                     break;
                 case MONEY:
                     int money = _confignNode.getNode("orders", objectId, "reward", "money").getInt();
-                    order = new Order(orderId, orderedByPlayer, orderedPlayer, new MoneyReward(money));
+                    order = new Order(orderId, orderedByPlayer, orderedPlayer, new MoneyReward(money), isAccepted, acceptedByPlayerUUID);
                     orderList.add(order);
                     break;
                 case ITEM:
                     try
                     {
                         ItemStack itemStack = _confignNode.getNode("orders", objectId, "reward", "item").getValue(TypeToken.of(ItemStack.class));
-                        order = new Order(orderId, orderedByPlayer, orderedPlayer, new ItemReward(itemStack));
+                        order = new Order(orderId, orderedByPlayer, orderedPlayer, new ItemReward(itemStack), isAccepted, acceptedByPlayerUUID);
                         orderList.add(order);
                         break;
                     }
@@ -149,6 +163,15 @@ public class HOCONOrderStorage implements IStorage
                 return index;
             }
         }
+    }
+
+    @Override
+    public boolean acceptOrder(int orderId, UUID acceptedByPlayerUUID)
+    {
+        _confignNode.getNode("orders", String.valueOf(orderId), "accepted-by-player").setValue(acceptedByPlayerUUID.toString());
+        _confignNode.getNode("orders", String.valueOf(orderId), "is-accepted").setValue(true);
+
+        return saveChanges();
     }
 
     private void load()

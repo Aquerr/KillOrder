@@ -6,6 +6,7 @@ import io.aquerr.killorder.storage.IStorage;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 public class OrderManager
 {
@@ -24,9 +25,14 @@ public class OrderManager
         return _orderStorage.addOrder(order);
     }
 
-    public static boolean removeOrder(Order order)
+    public static boolean removeOrder(int orderId)
     {
-        return _orderStorage.removeOrder(order);
+        return _orderStorage.removeOrder(orderId);
+    }
+
+    public static boolean acceptOrder(int orderId, UUID acceptedByPlayerUUID)
+    {
+     return _orderStorage.acceptOrder(orderId, acceptedByPlayerUUID);
     }
 
     public static List<Order> getOrderList()
