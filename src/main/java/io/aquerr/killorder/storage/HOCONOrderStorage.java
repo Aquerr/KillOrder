@@ -51,7 +51,7 @@ public class HOCONOrderStorage implements IStorage
     {
         try
         {
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrdererdByPlayerUUID().toString());
+            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrderedByPlayerUUID().toString());
             _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
 
             _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "is-accepted"}).setValue(order.isAccepted());

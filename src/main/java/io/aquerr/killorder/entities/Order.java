@@ -41,7 +41,7 @@ public final class Order
         return orderedPlayerUUID;
     }
 
-    public UUID getOrdererdByPlayerUUID()
+    public UUID getOrderedByPlayerUUID()
     {
         return orderedByPlayerUUID;
     }
@@ -61,7 +61,7 @@ public final class Order
         return isAccepted;
     }
 
-    public UUID getAcceptedByPlayerUUID()
+    public @Nullable UUID getAcceptedByPlayerUUID()
     {
         return acceptedByPlayerUUID;
     }

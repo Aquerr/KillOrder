@@ -38,9 +38,9 @@ public class ListCommand implements CommandExecutor
             }
 
             String orderingPlayerName = null;
-            if (GameProfile.of(order.getOrdererdByPlayerUUID()).getName().isPresent())
+            if (GameProfile.of(order.getOrderedByPlayerUUID()).getName().isPresent())
             {
-                orderingPlayerName = GameProfile.of(order.getOrdererdByPlayerUUID()).getName().get();
+                orderingPlayerName = GameProfile.of(order.getOrderedByPlayerUUID()).getName().get();
             }
 
             if (order.isAccepted())

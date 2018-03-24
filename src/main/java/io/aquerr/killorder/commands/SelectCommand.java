@@ -75,7 +75,7 @@ public class SelectCommand implements CommandExecutor
                     break;
             }
 
-            Order order = new Order(player.getUniqueId(), optionalPlayer.get().getUniqueId(), orderReward);
+            Order order = new Order(player.getUniqueId(), optionalPlayer.get().getUniqueId(), orderReward, false, null);
 
             if (!OrderManager.getOrderList().contains(order))
             {
