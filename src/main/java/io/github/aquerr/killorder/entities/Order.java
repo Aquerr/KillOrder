@@ -1,20 +1,20 @@
-package io.aquerr.killorder.entities;
+package io.github.aquerr.killorder.entities;
 
-import io.aquerr.killorder.managers.OrderManager;
+import io.github.aquerr.killorder.KillOrder;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
 public final class Order
 {
-    private int orderId;
-    private UUID orderedByPlayerUUID;
-    private UUID orderedPlayerUUID;
+    private final int orderId;
+    private final UUID orderedByPlayerUUID;
+    private final UUID orderedPlayerUUID;
 
-    private boolean isAccepted;
-    private UUID acceptedByPlayerUUID;
+    private final boolean isAccepted;
+    private final UUID acceptedByPlayerUUID;
 
-    private OrderReward orderReward;
+    private final OrderReward orderReward;
 
     public Order(int orderId, UUID orderedByPlayerUUID, UUID orderedPlayerUUID, OrderReward orderReward, boolean isAccepted, @Nullable UUID acceptedByPlayerUUID)
     {
@@ -28,7 +28,7 @@ public final class Order
 
     public Order(UUID orderedByPlayerUUID, UUID orderedPlayerUUID, OrderReward orderReward, boolean isAccepted, @Nullable UUID acceptedByPlayerUUID)
     {
-        this.orderId = OrderManager.getLastAvailableIndex();
+        this.orderId = KillOrder.getInstance().getOrderManager().getLastAvailableIndex();
         this.orderedByPlayerUUID = orderedByPlayerUUID;
         this.orderedPlayerUUID = orderedPlayerUUID;
         this.orderReward = orderReward;

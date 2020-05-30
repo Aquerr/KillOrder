@@ -1,10 +1,10 @@
-package io.aquerr.killorder.listeners;
+package io.github.aquerr.killorder.listeners;
 
-import io.aquerr.killorder.entities.ItemReward;
-import io.aquerr.killorder.entities.MoneyReward;
-import io.aquerr.killorder.entities.Order;
-import io.aquerr.killorder.entities.PowerReward;
-import io.aquerr.killorder.managers.OrderManager;
+import io.github.aquerr.killorder.entities.ItemReward;
+import io.github.aquerr.killorder.entities.MoneyReward;
+import io.github.aquerr.killorder.entities.Order;
+import io.github.aquerr.killorder.entities.PowerReward;
+import io.github.aquerr.killorder.managers.OrderManager;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
@@ -16,6 +16,13 @@ import java.util.stream.Collectors;
 
 public class PlayerKillListener
 {
+    private final OrderManager orderManager;
+
+    public PlayerKillListener(final OrderManager orderManager)
+    {
+        this.orderManager = orderManager;
+    }
+
     @Listener
     public void onPlayerKill(DamageEntityEvent event, @Getter("getTargetEntity") Player damagedPlayer)
     {
@@ -27,7 +34,7 @@ public class PlayerKillListener
 
                 if (entityDamageSource.getSource() instanceof Player)
                 {
-                    List<Order> orderList = OrderManager.getOrderList().stream().filter(x -> x.getOrderedPlayerUUID().equals(damagedPlayer.getUniqueId()) && x.isAccepted()).collect(Collectors.toList());
+                    List<Order> orderList = this.orderManager.getOrderList().stream().filter(x -> x.getOrderedPlayerUUID().equals(damagedPlayer.getUniqueId()) && x.isAccepted()).collect(Collectors.toList());
                     if (!orderList.isEmpty())
                     {
                         Player attacker = (Player) entityDamageSource.getSource();
@@ -57,7 +64,7 @@ public class PlayerKillListener
                                     attacker.getInventory().offer(itemReward.getItem());
                                 }
 
-                                OrderManager.removeOrder(order.getOrderId());
+                                this.orderManager.removeOrder(order.getOrderId());
                             }
                         }
                     }

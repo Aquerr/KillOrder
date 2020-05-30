@@ -1,4 +1,4 @@
-package io.aquerr.killorder;
+package io.github.aquerr.killorder;
 
 import javax.inject.Singleton;
 

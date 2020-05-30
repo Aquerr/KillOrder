@@ -1,21 +1,13 @@
-package io.aquerr.killorder.commands;
+package io.github.aquerr.killorder.commands;
 
-import io.aquerr.killorder.KillOrder;
-import io.aquerr.killorder.PluginInfo;
-import io.aquerr.killorder.entities.*;
-import io.aquerr.killorder.managers.OrderManager;
-import org.spongepowered.api.command.CommandException;
+import io.github.aquerr.killorder.PluginInfo;
+import io.github.aquerr.killorder.entities.*;
+import io.github.aquerr.killorder.managers.OrderManager;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -23,6 +15,13 @@ import java.util.Optional;
 
 public class SelectCommand implements CommandExecutor
 {
+    private final OrderManager orderManager;
+
+    public SelectCommand(final OrderManager orderManager)
+    {
+        this.orderManager = orderManager;
+    }
+
     @Override
     public CommandResult execute(CommandSource source, CommandContext context)
     {
@@ -86,9 +85,9 @@ public class SelectCommand implements CommandExecutor
 
             Order order = new Order(player.getUniqueId(), optionalPlayer.get().getUniqueId(), orderReward, false, null);
 
-            if (!OrderManager.getOrderList().contains(order))
+            if (!this.orderManager.getOrderList().contains(order))
             {
-                OrderManager.addOrder(order);
+                this.orderManager.addOrder(order);
             }
         }
 

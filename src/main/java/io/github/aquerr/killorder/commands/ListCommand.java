@@ -1,11 +1,11 @@
-package io.aquerr.killorder.commands;
+package io.github.aquerr.killorder.commands;
 
-import io.aquerr.killorder.PluginInfo;
-import io.aquerr.killorder.entities.ItemReward;
-import io.aquerr.killorder.entities.MoneyReward;
-import io.aquerr.killorder.entities.Order;
-import io.aquerr.killorder.entities.PowerReward;
-import io.aquerr.killorder.managers.OrderManager;
+import io.github.aquerr.killorder.PluginInfo;
+import io.github.aquerr.killorder.entities.ItemReward;
+import io.github.aquerr.killorder.entities.MoneyReward;
+import io.github.aquerr.killorder.entities.Order;
+import io.github.aquerr.killorder.entities.PowerReward;
+import io.github.aquerr.killorder.managers.OrderManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -25,13 +25,20 @@ import java.util.function.Consumer;
 
 public class ListCommand implements CommandExecutor
 {
+    private final OrderManager orderManager;
+
+    public ListCommand(final OrderManager orderManager)
+    {
+        this.orderManager = orderManager;
+    }
+
 
     @Override
     public CommandResult execute(CommandSource source, CommandContext context) throws CommandException
     {
         List<Text> helpList = new ArrayList<>();
 
-        for(Order order : OrderManager.getOrderList())
+        for(Order order : this.orderManager.getOrderList())
         {
             String orderedPlayerName = null;
             if (Sponge.getServer().getPlayer(order.getOrderedPlayerUUID()).isPresent())
@@ -106,14 +113,14 @@ public class ListCommand implements CommandExecutor
         return accept ->
         {
             //Because the text can exists in the chat after being accepted then we need to make this check...
-            if (OrderManager.getOrderList().stream().anyMatch(x-> x.getOrderId() == orderId && x.isAccepted()))
+            if (this.orderManager.getOrderList().stream().anyMatch(x-> x.getOrderId() == orderId && x.isAccepted()))
             {
                 player.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.RED, "This order is already taken!"));
             }
             else
             {
                 player.sendMessage(Text.of(PluginInfo.PluginPrefix, TextColors.GREEN, "You accepted order " + orderId + "!"));
-                OrderManager.acceptOrder(orderId, player.getUniqueId());
+                this.orderManager.acceptOrder(orderId, player.getUniqueId());
             }
         };
     }

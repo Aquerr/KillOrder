@@ -1,8 +1,8 @@
-package io.aquerr.killorder.commands;
+package io.github.aquerr.killorder.commands;
 
 import com.google.common.collect.Lists;
-import io.aquerr.killorder.KillOrder;
-import io.aquerr.killorder.PluginInfo;
+import io.github.aquerr.killorder.KillOrder;
+import io.github.aquerr.killorder.PluginInfo;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;

@@ -1,7 +1,7 @@
-package io.aquerr.killorder.storage;
+package io.github.aquerr.killorder.storage;
 
 import com.google.common.reflect.TypeToken;
-import io.aquerr.killorder.entities.*;
+import io.github.aquerr.killorder.entities.*;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -18,58 +18,54 @@ import java.util.UUID;
 
 public class HOCONOrderStorage implements IStorage
 {
-    ConfigurationLoader<CommentedConfigurationNode> _configurationLoader;
-    CommentedConfigurationNode _confignNode;
+    ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
+    CommentedConfigurationNode configNode;
 
-    public HOCONOrderStorage(Path configDir)
+    public HOCONOrderStorage(final Path configDir)
     {
         try
         {
-            if (!Files.exists(configDir))
-            {
+            if (Files.notExists(configDir))
                 Files.createDirectory(configDir);
-            }
 
-            Path filePath = configDir.resolve("orders.conf");
+            final Path filePath = configDir.resolve("orders.conf");
 
-            if (!Files.exists(filePath))
-            {
+            if (Files.notExists(filePath))
                 Files.createFile(filePath);
-            }
 
-            _configurationLoader = HoconConfigurationLoader.builder().setPath(filePath).build();
+            this.configurationLoader = HoconConfigurationLoader.builder().setPath(filePath).build();
             load();
         }
-        catch (IOException exception)
+        catch (final IOException exception)
         {
             exception.printStackTrace();
         }
     }
 
     @Override
-    public boolean addOrder(Order order)
+    public boolean addOrder(final Order order)
     {
         try
         {
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrderedByPlayerUUID().toString());
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
+            this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-by-player"}).setValue(order.getOrderedByPlayerUUID().toString());
+            this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "ordered-player"}).setValue(order.getOrderedPlayerUUID().toString());
 
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "is-accepted"}).setValue(order.isAccepted());
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "accepted-by-player"}).setValue(order.getAcceptedByPlayerUUID());
+            this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "is-accepted"}).setValue(order.isAccepted());
+            this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "accepted-by-player"}).setValue(order.getAcceptedByPlayerUUID());
 
-            _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
+            this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "type"}).setValue(order.getOrderReward().getOrderRewardType().name());
 
             if (order.getOrderReward().getOrderRewardType() == OrderRewardType.ITEM)
             {
-                _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "item"}).setValue(((ItemReward)order.getOrderReward()).getItem());
+                this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "item"}).setValue(((ItemReward)order.getOrderReward()).getItem());
             }
             else if(order.getOrderReward().getOrderRewardType() == OrderRewardType.MONEY)
             {
-                _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "money"}).setValue(((MoneyReward)order.getOrderReward()).getMoney());
+                this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "money"}).setValue(((MoneyReward)order.getOrderReward()).getMoney());
             }
             else if(order.getOrderReward().getOrderRewardType() == OrderRewardType.POWER)
             {
-                _confignNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "power"}).setValue(((PowerReward)order.getOrderReward()).getPowerAmount());
+                this.configNode.getNode(new Object[]{"orders", String.valueOf(order.getOrderId()), "reward", "power"}).setValue(((PowerReward)order.getOrderReward()).getPowerAmount());
             }
 
             return saveChanges();
@@ -84,52 +80,51 @@ public class HOCONOrderStorage implements IStorage
     @Override
     public boolean removeOrder(int orderId)
     {
-        _confignNode.getNode("orders").removeChild(orderId);
-
+        this.configNode.getNode("orders").removeChild(orderId);
         return saveChanges();
     }
 
     @Override
     public List<Order> getOrders()
     {
-        Set<Object> objectSet = _confignNode.getNode("orders").getChildrenMap().keySet();
+        Set<Object> objectSet = this.configNode.getNode("orders").getChildrenMap().keySet();
 
         List<Order> orderList = new ArrayList<>();
 
         for (Object objectId : objectSet)
         {
             int orderId = Integer.parseInt(objectId.toString());
-            UUID orderedByPlayer = UUID.fromString(_confignNode.getNode("orders", objectId, "ordered-by-player").getString());
-            UUID orderedPlayer = UUID.fromString(_confignNode.getNode("orders", objectId, "ordered-player").getString());
+            UUID orderedByPlayer = UUID.fromString(this.configNode.getNode("orders", objectId, "ordered-by-player").getString());
+            UUID orderedPlayer = UUID.fromString(this.configNode.getNode("orders", objectId, "ordered-player").getString());
 
-            boolean isAccepted = _confignNode.getNode(new Object[]{"orders", objectId, "is-accepted"}).getBoolean();
+            boolean isAccepted = this.configNode.getNode(new Object[]{"orders", objectId, "is-accepted"}).getBoolean();
             UUID acceptedByPlayerUUID = null;
 
-            if (_confignNode.getNode("orders", objectId, "accepted-by-player").getString() != null)
+            if (this.configNode.getNode("orders", objectId, "accepted-by-player").getString() != null)
             {
-                acceptedByPlayerUUID = UUID.fromString(_confignNode.getNode("orders", objectId, "accepted-by-player").getString());
+                acceptedByPlayerUUID = UUID.fromString(this.configNode.getNode("orders", objectId, "accepted-by-player").getString());
             }
 
-            OrderRewardType rewardType = OrderRewardType.valueOf(_confignNode.getNode("orders", objectId, "reward", "type").getString());
+            OrderRewardType rewardType = OrderRewardType.valueOf(this.configNode.getNode("orders", objectId, "reward", "type").getString());
 
             Order order;
 
             switch (rewardType)
             {
                 case POWER:
-                    int power = _confignNode.getNode("orders", objectId, "reward", "power").getInt();
+                    int power = this.configNode.getNode("orders", objectId, "reward", "power").getInt();
                     order = new Order(orderId, orderedByPlayer, orderedPlayer, new PowerReward(power), isAccepted, acceptedByPlayerUUID);
                     orderList.add(order);
                     break;
                 case MONEY:
-                    int money = _confignNode.getNode("orders", objectId, "reward", "money").getInt();
+                    int money = this.configNode.getNode("orders", objectId, "reward", "money").getInt();
                     order = new Order(orderId, orderedByPlayer, orderedPlayer, new MoneyReward(money), isAccepted, acceptedByPlayerUUID);
                     orderList.add(order);
                     break;
                 case ITEM:
                     try
                     {
-                        ItemStack itemStack = _confignNode.getNode("orders", objectId, "reward", "item").getValue(TypeToken.of(ItemStack.class));
+                        ItemStack itemStack = this.configNode.getNode("orders", objectId, "reward", "item").getValue(TypeToken.of(ItemStack.class));
                         order = new Order(orderId, orderedByPlayer, orderedPlayer, new ItemReward(itemStack), isAccepted, acceptedByPlayerUUID);
                         orderList.add(order);
                         break;
@@ -147,7 +142,7 @@ public class HOCONOrderStorage implements IStorage
     @Override
     public int getLastAvailableOrderIndex()
     {
-        Set<Object> objectSet = _confignNode.getNode("orders").getChildrenMap().keySet();
+        Set<Object> objectSet = this.configNode.getNode("orders").getChildrenMap().keySet();
 
         int index = 1;
 
@@ -168,8 +163,8 @@ public class HOCONOrderStorage implements IStorage
     @Override
     public boolean acceptOrder(int orderId, UUID acceptedByPlayerUUID)
     {
-        _confignNode.getNode("orders", String.valueOf(orderId), "accepted-by-player").setValue(acceptedByPlayerUUID.toString());
-        _confignNode.getNode("orders", String.valueOf(orderId), "is-accepted").setValue(true);
+        this.configNode.getNode("orders", String.valueOf(orderId), "accepted-by-player").setValue(acceptedByPlayerUUID.toString());
+        this.configNode.getNode("orders", String.valueOf(orderId), "is-accepted").setValue(true);
 
         return saveChanges();
     }
@@ -178,7 +173,7 @@ public class HOCONOrderStorage implements IStorage
     {
         try
         {
-            _confignNode = _configurationLoader.load();
+            this.configNode = this.configurationLoader.load();
         }
         catch (IOException exception)
         {
@@ -190,7 +185,7 @@ public class HOCONOrderStorage implements IStorage
     {
         try
         {
-            _configurationLoader.save(_confignNode);
+            this.configurationLoader.save(this.configNode);
             return true;
         }
         catch (IOException e)

@@ -1,4 +1,4 @@
-package io.aquerr.killorder.listeners;
+package io.github.aquerr.killorder.listeners;
 
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;

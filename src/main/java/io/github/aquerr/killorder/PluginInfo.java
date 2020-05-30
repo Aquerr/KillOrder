@@ -1,4 +1,4 @@
-package io.aquerr.killorder;
+package io.github.aquerr.killorder;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;

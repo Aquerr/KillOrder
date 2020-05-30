@@ -1,6 +1,6 @@
-package io.aquerr.killorder.storage;
+package io.github.aquerr.killorder.storage;
 
-import io.aquerr.killorder.entities.Order;
+import io.github.aquerr.killorder.entities.Order;
 
 import java.util.List;
 import java.util.UUID;

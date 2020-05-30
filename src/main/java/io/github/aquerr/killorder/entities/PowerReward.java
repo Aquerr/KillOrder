@@ -1,4 +1,4 @@
-package io.aquerr.killorder.entities;
+package io.github.aquerr.killorder.entities;
 
 public class PowerReward extends OrderReward
 {
